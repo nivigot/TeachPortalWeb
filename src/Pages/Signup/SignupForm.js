@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../../Components/Layout';
 import { signupApi } from '../../Services/api';
 import { validateLength, validateEmail } from '../../Validation/validation';
@@ -23,17 +23,16 @@ export default function SignupForm() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const onChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-  const onBlur   = (e) => setTouched(t => ({ ...t, [e.target.name]: true }));
+  const onBlur = (e) => setTouched(t => ({ ...t, [e.target.name]: true }));
 
-  // client-side validation
   const errors = useMemo(() => {
     const e = {};
-    e.userName  = validateLength(form.userName, 3, 30);
+    e.userName = validateLength(form.userName, 3, 30);
     e.firstName = validateLength(form.firstName, 2, 50);
-    e.lastName  = validateLength(form.lastName, 2, 50);
-    e.email     = validateEmail(form.email);
-    e.password  = form.password.length < 6 ? 'Use at least 6 characters.' : '';
-    e.confirm   = form.password !== form.confirm ? 'Passwords do not match.' : '';
+    e.lastName = validateLength(form.lastName, 2, 50);
+    e.email = validateEmail(form.email);
+    e.password = form.password.length < 6 ? 'Use at least 6 characters.' : '';
+    e.confirm = form.password !== form.confirm ? 'Passwords do not match.' : '';
     return e;
   }, [form]);
 
@@ -52,7 +51,7 @@ export default function SignupForm() {
     if (/[a-z]/.test(p)) s++;
     if (/\d/.test(p)) s++;
     if (/[^\w\s]/.test(p)) s++;
-    return s; // 0..5
+    return s;
   }, [form.password]);
 
   const submit = async (e) => {
@@ -74,7 +73,7 @@ export default function SignupForm() {
       const body = {
         userName: form.userName,
         email: form.email,
-        passwordHash: form.password, 
+        passwordHash: form.password,
         firstName: form.firstName,
         lastName: form.lastName,
         students: [],
@@ -103,14 +102,16 @@ export default function SignupForm() {
   return (
     <Layout>
       <div className="auth-wrap">
-        <div className="card auth-card">
-          <div className="card-header">
-            <div className="card-title">Create your teacher account</div>
-            <div className="card-subtitle">It’s quick and free.</div>
+        <div className="card signup-card">
+          <div className="signup-header">
+            <div>
+              <p className="signup-title">Create your teacher account</p>
+              <p className="signup-subtitle">It's quick and free.</p>
+            </div>
           </div>
 
-          <div className="card-body">
-            {serverError && <div className="alert" role="alert">{serverError}</div>}
+          <div className="signup-body">
+            {serverError && <div className="alert" role="alert" style={{ marginBottom: 16 }}>{serverError}</div>}
 
             <form onSubmit={submit} noValidate>
               <div className="two-col">
@@ -191,11 +192,11 @@ export default function SignupForm() {
                       type="button"
                       className="pwd-toggle"
                       onClick={() => setShowPwd(s => !s)}
-                      aria-label={showPwd ? 'Hide password' : 'Show password'}>
+                      aria-label={showPwd ? 'Hide password' : 'Show password'}
+                    >
                       {showPwd ? '🙈' : '👁️'}
                     </button>
                   </div>
-
                   <div className="pwd-meter" aria-hidden="true">
                     <div className={`bar s${strength}`} />
                   </div>
@@ -219,7 +220,8 @@ export default function SignupForm() {
                       type="button"
                       className="pwd-toggle"
                       onClick={() => setShowConfirm(s => !s)}
-                      aria-label={showConfirm ? 'Hide password' : 'Show password'}>
+                      aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                    >
                       {showConfirm ? '🙈' : '👁️'}
                     </button>
                   </div>
@@ -227,12 +229,12 @@ export default function SignupForm() {
                 </div>
               </div>
 
-              <div className="form-actions">
+              <div className="form-actions" style={{ marginTop: 20 }}>
                 <button className="btn btn-primary" type="submit" disabled={loading || !canSubmit}>
                   {loading ? 'Creating account…' : 'Create account'}
                 </button>
                 <span className="hint">
-                  Already have an account? <a href="/login">Log in</a>
+                  Already have an account? <Link to="/login">Log in</Link>
                 </span>
               </div>
             </form>

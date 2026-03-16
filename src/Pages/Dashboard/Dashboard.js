@@ -5,8 +5,6 @@ import { api } from '../../Services/api';
 import { validateLength, validateEmail } from '../../Validation/validation';
 import './Dashboard.css';
 import Layout from '../../Components/Layout';
-import '../../Components/Layout.css';
-
 
 function getTeacherIdFromToken() {
   const token = localStorage.getItem('token');
@@ -14,7 +12,6 @@ function getTeacherIdFromToken() {
   try {
     const [, payload] = token.split('.');
     const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-    
     return Number(
       json.teacherId ??
       json.tid ??
@@ -29,7 +26,7 @@ function getTeacherIdFromToken() {
 
 const DashboardComponent = () => {
   const navigate = useNavigate();
-  
+
   const [authChecked, setAuthChecked] = useState(false);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,13 +34,13 @@ const DashboardComponent = () => {
   const [error, setError] = useState('');
 
   const [firstName, setFirstName] = useState('');
-  const [lastName,  setLastName]  = useState('');
-  const [email,     setEmail]     = useState('');
-  const [errors,    setErrors]    = useState({});
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [errors, setErrors] = useState({});
 
-  const [query, setQuery]       = useState('');
-  const [sortBy, setSortBy]     = useState('firstName'); 
-  const [sortDir, setSortDir]   = useState('asc');       
+  const [query, setQuery] = useState('');
+  const [sortBy, setSortBy] = useState('firstName');
+  const [sortDir, setSortDir] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -61,7 +58,7 @@ const DashboardComponent = () => {
 
   const fetchStudents = async () => {
     try {
-      setLoading(true);      
+      setLoading(true);
       const { data } = await api.get('/students');
       setStudents(Array.isArray(data) ? data : []);
       setError('');
@@ -77,8 +74,8 @@ const DashboardComponent = () => {
   const validate = () => {
     const v = {};
     v.firstName = validateLength(firstName, 2, 50);
-    v.lastName  = validateLength(lastName,  2, 50);
-    v.email     = validateEmail(email);
+    v.lastName = validateLength(lastName, 2, 50);
+    v.email = validateEmail(email);
     setErrors(v);
     return Object.values(v).every((e) => !e);
   };
@@ -95,27 +92,29 @@ const DashboardComponent = () => {
 
     const newStudent = {
       firstName: firstName.trim(),
-      lastName : lastName.trim(),
-      email    : email.trim(),      
-      
+      lastName: lastName.trim(),
+      email: email.trim(),
     };
 
     try {
       setSaving(true);
       const res = await api.post('/students', newStudent, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
-      const created = res?.data ?? newStudent; 
+      const created = res?.data ?? newStudent;
       setStudents((prev) => [created, ...prev]);
-      setFirstName(''); setLastName(''); setEmail('');
-      setErrors({}); setError('');
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setErrors({});
+      setError('');
     } catch (err) {
       console.error('POST /students failed', err?.response?.data);
-  const pd = err?.response?.data;
-  const msg =
-    pd?.errors ? Object.entries(pd.errors).map(([k,v]) => `${k}: ${v.join(', ')}`).join(' | ')
-               : pd?.message || 'Could not add student. Please try again.';
-  setError(msg);
+      const pd = err?.response?.data;
+      const msg = pd?.errors
+        ? Object.entries(pd.errors).map(([k, v]) => `${k}: ${v.join(', ')}`).join(' | ')
+        : pd?.message || 'Could not add student. Please try again.';
+      setError(msg);
     } finally {
       setSaving(false);
     }
@@ -125,7 +124,7 @@ const DashboardComponent = () => {
     if (col === sortBy) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     else { setSortBy(col); setSortDir('asc'); }
   };
-  
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const base = q
@@ -136,20 +135,18 @@ const DashboardComponent = () => {
         )
       : students;
 
-    const sorted = [...base].sort((a, b) => {
+    return [...base].sort((a, b) => {
       const av = (a?.[sortBy] ?? '').toString().toLowerCase();
       const bv = (b?.[sortBy] ?? '').toString().toLowerCase();
       if (av < bv) return sortDir === 'asc' ? -1 : 1;
-      if (av > bv) return sortDir === 'asc' ?  1 : -1;
+      if (av > bv) return sortDir === 'asc' ? 1 : -1;
       return 0;
     });
-    return sorted;
   }, [students, query, sortBy, sortDir]);
 
- 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const page = Math.min(currentPage, totalPages);
-  const indexOfLast  = page * pageSize;
+  const indexOfLast = page * pageSize;
   const indexOfFirst = indexOfLast - pageSize;
   const currentStudents = filtered.slice(indexOfFirst, indexOfLast);
 
@@ -160,8 +157,8 @@ const DashboardComponent = () => {
   return (
     <Layout>
       <div className="dashboard-container">
-         <h2 className="tov2-title">Dashboard</h2>
-        {/* Add student */}
+        <h2 className="page-title">Dashboard</h2>
+
         <div className="card">
           <div className="card-header">
             <div>
@@ -170,6 +167,7 @@ const DashboardComponent = () => {
             </div>
           </div>
           <div className="card-body">
+            {error && <div className="alert" style={{ marginBottom: 14 }}>{error}</div>}
             <form onSubmit={handleSubmit} className="form">
               <div className="form-row">
                 <div className="form-group">
@@ -225,7 +223,6 @@ const DashboardComponent = () => {
           </div>
         </div>
 
-        {/* Students table */}
         <div className="card">
           <div className="card-header">
             <div className="card-title">Students</div>
@@ -249,38 +246,32 @@ const DashboardComponent = () => {
             </div>
           </div>
 
-          <div className="card-body">
+          <div className="card-body" style={{ padding: 0 }}>
             {loading ? (
               <div className="loading">Loading students…</div>
-            ) : error ? (
-              <div className="alert">{error}</div>
             ) : currentStudents.length === 0 ? (
-              <div className="empty">No students to display.</div>
+              <div className="empty">
+                {query ? 'No students match your search.' : 'No students to display.'}
+              </div>
             ) : (
               <div className="table-wrap">
                 <table className="table student-table">
                   <thead>
                     <tr>
                       <th onClick={() => toggleSort('firstName')} className="th-sort">
-                        First Name {sortBy === 'firstName' && (
-                          <span className="sort-ind">{sortDir === 'asc' ? '▲' : '▼'}</span>
-                        )}
+                        First Name <span className="sort-ind">{sortBy === 'firstName' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</span>
                       </th>
                       <th onClick={() => toggleSort('lastName')} className="th-sort">
-                        Last Name {sortBy === 'lastName' && (
-                          <span className="sort-ind">{sortDir === 'asc' ? '▲' : '▼'}</span>
-                        )}
+                        Last Name <span className="sort-ind">{sortBy === 'lastName' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</span>
                       </th>
                       <th onClick={() => toggleSort('email')} className="th-sort">
-                        Email {sortBy === 'email' && (
-                          <span className="sort-ind">{sortDir === 'asc' ? '▲' : '▼'}</span>
-                        )}
+                        Email <span className="sort-ind">{sortBy === 'email' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</span>
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {currentStudents.map((s, i) => (
-                      <tr key={i}>
+                      <tr key={s.id ?? i}>
                         <td>{s.firstName}</td>
                         <td>{s.lastName}</td>
                         <td>{s.email}</td>
@@ -292,18 +283,19 @@ const DashboardComponent = () => {
             )}
           </div>
 
-          {/* Pagination */}
           <div className="pagination">
             <span className="muted">
               Page <b>{page}</b> of <b>{totalPages}</b>
+              {' '}·{' '}
+              <b>{filtered.length}</b> student{filtered.length !== 1 ? 's' : ''}
             </span>
-            <div>
+            <div style={{ display: 'flex', gap: 4 }}>
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 className="page-button"
                 disabled={page === 1}
               >
-                Prev
+                ← Prev
               </button>
 
               {Array.from({ length: totalPages }, (_, idx) => idx + 1)
@@ -323,7 +315,7 @@ const DashboardComponent = () => {
                 className="page-button"
                 disabled={page === totalPages}
               >
-                Next
+                Next →
               </button>
             </div>
           </div>

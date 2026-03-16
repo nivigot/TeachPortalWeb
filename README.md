@@ -1,70 +1,89 @@
-# Getting Started with Create React App
+# TeachPortalWeb
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React web application for managing teachers and their students. Built as a full-stack project with a .NET backend API and a React frontend.
 
-## Available Scripts
+## Live Features
 
-In the project directory, you can run:
+- **Authentication** — JWT-based login and registration with token expiry handling and automatic redirect on 401/403
+- **Dashboard** — Add students, search and sort the student list, paginate results
+- **Teacher Overview** — Browse all teachers, view each teacher's assigned students in a side-by-side panel layout
+- **Responsive Design** — Mobile-first layout with a collapsible hamburger navigation menu
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, React Router v7 |
+| HTTP Client | Axios (with request/response interceptors) |
+| Auth | JWT stored in localStorage, parsed client-side for claims |
+| Styling | Plain CSS with CSS custom properties (design tokens) |
+| Backend API | ASP.NET Core (separate repo) |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project Structure
 
-### `npm test`
+```
+src/
+├── Components/
+│   ├── Layout.js          # Sticky navbar with hamburger menu
+│   ├── Layout.css
+│   ├── AuthLayout.js
+│   └── PrivateRoute.js    # Route guard using AuthService.isAuthenticated()
+├── Pages/
+│   ├── Login/             # Sign-in form with client-side validation
+│   ├── Signup/            # Registration form with password strength meter
+│   ├── Dashboard/         # Add students + sortable/paginated table
+│   └── TeacherOverview/   # Teacher list + student panel (side-by-side)
+├── Services/
+│   ├── AuthService.js     # Login, logout, JWT claims, token expiry check
+│   └── api.js             # Axios instance with auth header + 401 redirect
+└── Validation/
+    └── validation.js      # Reusable field validators
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+### Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js 18+
+- The backend API running at `https://localhost:7251` (or configure `REACT_APP_API_URL`)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+git clone https://github.com/nivigot/TeachPortalWeb.git
+cd TeachPortalWeb
+npm install
+npm start
+```
 
-### `npm run eject`
+The app opens at `http://localhost:3000`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Environment Variables
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Create a `.env` file in the project root to override the default API URL:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+REACT_APP_API_URL=https://your-api-url/api
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Build for Production
 
-## Learn More
+```bash
+npm run build
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The optimised output is in the `build/` folder, ready to deploy to any static host (Netlify, Vercel, Azure Static Web Apps, etc.).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Key Implementation Details
 
-### Code Splitting
+**JWT Auth Flow** — `AuthService` stores the token in `localStorage`, parses it to extract teacher ID and expiry, and exposes `isAuthenticated()` which checks the `exp` claim. The Axios interceptor automatically attaches `Authorization: Bearer <token>` on every request and redirects to `/login` on 401/403.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+**Protected Routes** — `PrivateRoute` wraps authenticated pages and redirects unauthenticated users before the component mounts.
 
-### Analyzing the Bundle Size
+**Design System** — All colors, spacing, border radii, and shadows are defined as CSS custom properties in `index.css`, giving a single source of truth for the visual language across the app.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+**Form Validation** — Both `Login` and `Signup` run client-side validation before any API call, with per-field inline error messages and a password strength meter on signup.
 
-### Making a Progressive Web App
+## Author
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Gothai — [GitHub](https://github.com/nivigot)
