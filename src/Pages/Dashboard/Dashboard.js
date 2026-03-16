@@ -54,7 +54,7 @@ const DashboardComponent = () => {
       await fetchStudents();
     };
     check();
-  }, []);
+  }, [navigate]);
 
   const fetchStudents = async () => {
     try {
