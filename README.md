@@ -9,6 +9,7 @@ A responsive single-page application for teachers to manage their students. Buil
 - **Teacher overview** — Browse all teachers and view each teacher's assigned students in a responsive side-by-side panel
 - **Mobile-first layout** — Sticky navbar with animated hamburger menu; all pages are fully responsive down to 320 px
 
+
 ## Tech Stack
 
 | | |
