@@ -66,7 +66,7 @@ export default function LoginComponent() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   autoComplete="username"
-                  placeholder="e.g. john_doe"
+                  placeholder="e.g. johndoe"
                   required
                 />
               </div>
